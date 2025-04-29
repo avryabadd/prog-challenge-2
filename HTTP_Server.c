@@ -13,7 +13,6 @@ void *connection_handler(void *socket_desc) {
     char method[16] = {0};
     char url[1024] = {0};
     char protocol[16] = {0};
-    char response[2048] = {0};
     
     // Read the client request
     int read_size = read(sock, buffer, sizeof(buffer));
@@ -21,9 +20,20 @@ void *connection_handler(void *socket_desc) {
         // Parse the HTTP request using sscanf
         sscanf(buffer, "%15s %1023s %15s", method, url, protocol);
         
+        // Create the hello message
+        char *hello = "Hello, world!";
+        
         // Create the response with the parsed values
-        sprintf(response, "HTTP/1.1 200 OK\nContent-Type: text/html\n\nHello, world!\nMethod: %s\nURL: %s\nProtocol: %s\n\n", 
-                method, url, protocol);
+        char response[2048];
+        sprintf(response, 
+                "HTTP/1.1 200 OK\n"
+                "Content-Type: text/html\n"
+                "Content-Length: 12\n"
+                "Method: %s\n"
+                "URL: %s\n"
+                "Protocol: %s\n\n"
+                "%s\n\n", 
+                method, url, protocol, hello);
         
         // Send the response
         write(sock, response, strlen(response));
